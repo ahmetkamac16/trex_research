@@ -54,6 +54,7 @@ Git'i bilgisayarımda internet olmadan da kullanabilirim; GitHub, bu çalışmay
 | `git pull` | Uzak daldaki değişiklikleri alıp mevcut dalımla birleştiririm; ayara göre merge veya rebase yapılabilir. |
 | `git branch arastirma` | Yeni dal oluştururum; bu komut tek başına o dala geçirmez. |
 | `git merge arastirma` | Belirtilen dalı o anda bulunduğum dala birleştiririm. |
+| `git checkout -b arastirma` | Yeni dal oluşturma ve ona dala geçme yapılır. Dallar arası geçişlerde de kullanılır. |
 
 Örneğin `git switch arastirma` ile araştırma dalına geçip çalışabilirim. `add`, `commit` ve `push` aynı işlem değildir: hazırlama, yerel kaydetme ve paylaşma adımlarıdır.
 
@@ -249,6 +250,28 @@ JavaScript'teki “arrow function” ifadesine benzese de C#'ta `=>`, lambda ve 
 Func<int, int> ikiKat = sayi => sayi * 2; // Lambda
 decimal KdvEkle(decimal fiyat) => fiyat * 1.20m; // Kısa metot gövdesi
 ```
+### `=>` ile async kullanımı
+
+=> tek başına asenkronluk sağlamaz. Bir lambda ya da kısa metot gövdesini asenkron yapmak için başına async anahtar kelimesi eklenir ve dönüş tipi Task / Task<T> olur. Gövdede await kullanılabilir.
+
+```csharp
+// Asenkron lambda
+Func<int, Task<int>> ikiKatAsync = async sayi =>
+{
+    await Task.Delay(100); // Örnek bekleme
+    return sayi * 2;
+};
+
+// Asenkron kısa metot gövdesi
+async Task<string> SayfaGetirAsync(string url) =>
+    await httpClient.GetStringAsync(url);
+
+// Kullanım
+int sonuc = await ikiKatAsync(5);          // 10
+string html = await SayfaGetirAsync("https://ornek.com");
+```
+
+Bu örneklerde =>, sol taraftaki parametreleri sağ taraftaki gövdeye bağlayarak yazımı kısaltır; asenkronluğu sağlayan ise başa eklenen async anahtar kelimesidir. ikiKatAsync lambdasında await Task.Delay(100) satırı, iş parçacığını kilitlemeden 100 ms bekler ve ardından sayi * 2 sonucunu Task<int> olarak döndürür. SayfaGetirAsync metodunda ise =>, süslü parantez ve return yazmadan gövdeyi tek satırda tanımlar; metot, sayfa içeriğini indirirken programın geri kalanının çalışmasına izin verir. Kullanım kısmındaki await ifadeleri, görevler tamamlanana kadar bekleyip Task içindeki gerçek değeri değişkenlere aktarır; await olmasaydı değişkenlere sonuç yerine henüz bitmemiş bir Task nesnesi atanırdı.
 
 ## 3. Backend Geliştirme Temelleri
 
@@ -387,10 +410,20 @@ Belirli bir kaynağı silmek için kullanılır.
 - 404: İstenen kaynak bulunamadı.
 - 500: Sunucuda beklenmeyen bir hata oluştu.
 
-
 ### RESTful Servislerin Mantığı
 
 REST'te ürün gibi kaynakları URL ile tanımlar, işlemi HTTP metoduyla belirtirim. İstekler kendi başına anlaşılabilmelidir; sunucunun önceki isteğe ait istemci oturum bağlamına dayanması gerekmez. Bu **stateless** olma kuralı, sunucuda veritabanı bulunamayacağı anlamına gelmez. Kaynaklar, standart metotlar ve uygun durum kodları API'yi daha anlaşılır yapar.
+
+### OpenAPI Nedir?
+
+OpenAPI, bir API'nin nasıl kullanılacağını tanımlar. Hangi adreslere istek gönderilebileceğini, hangi bilgilerin gerektiğini ve nasıl yanıt alınacağını YAML veya JSON formatında açıklar.
+
+### Swagger Nedir?
+
+Swagger OpenAPI tanımlarını oluşturmak, görüntülemek ve test etmek için kullanılan araçlar ailesidir. Sık karşılaşılan Swagger araçları şunlardır:
+- Swagger Editör: OpenAPI dosyasını yazmana ve tanımdaki hataları görmemize yardımcı olur.
+- Swagger UI: Tanımı okuyup endpoint'leri, parametreleri ve yanıt örneklerini tarayıcıda gösterir.
+- Swagger Codegen: API tanımından istemci kodu ve sunucu iskeleti üretmek için kullanılır.
 
 ### JSON
 
@@ -461,9 +494,22 @@ app.MapControllers();
 
 Hata yakalayıcı başta olduğunda sonraki bileşenlerden gelen hataları yakalayabilir. Routing uç noktayı belirler; authentication kimliği oluşturur, authorization erişimi kontrol eder. Bu yüzden kimlik doğrulama yetkilendirmeden önce gelmelidir. Yanıt, çağrı zincirinde geri döner. Modern projelerde bunlar `Program.cs`, eski düzenlerde `Startup.Configure` içinde görülebilir.
 
-### Worker ve background job
+### Background Worker 
 
-**Worker**, arka plan işlemlerini yürüten uygulama/servis yapısıdır; .NET'te `BackgroundService` ile kuyruk dinlemek gibi işler yapabilir. **Background job**, arka planda çalıştırılan belirli bir iş birimidir; örneğin her gece satış raporu hazırlamak. Yani biri işi yürüten yapı, diğeri yürütülen iştir. Kalıcı kuyruk, zamanlama ve yeniden deneme gerekiyorsa bunları ayrıca sağlayan bir altyapı gerekir.
+Background worker, bir uygulamada işleri arka planda yapan yardımcı süreçtir. Kullanıcı uygulamayı kullanmaya devam ederken zaman alan görevleri yürütür.
+Örneğin bir sitede “Rapor oluştur” düğmesine bastığında:
+1. Uygulama rapor isteğini bir iş kuyruğuna ekler.
+2. Background worker bu işi alıp raporu hazırlar.
+3. İş bitince rapor indirilebilir hâle gelir veya sana bildirim gönderilir.
+E-posta gönderme, video işleme ve dosya dönüştürme gibi görevlerde kullanılır. Böylece uygulama, uzun süren işlerin bitmesini beklemeden yanıt verebilir.
+
+### Background Job
+
+Background job, bir olay, kullanıcı işlemi veya belirlenmiş zaman tarafından tetiklendiğinde arka planda çalışan görevdir. Kullanıcının uygulamayı kullanmasını engellemeden e-posta gönderme, rapor hazırlama veya yedekleme gibi işleri gerçekleştirir.
+Önceki kavramla ilişkisi şöyle:
+- Background job: Yapılacak iş.
+- Background worker: O işi yapan süreç.
+Örneğin “Bu kullanıcıya hoş geldin e-postası gönder” bir job’dır. Kuyruktan bu görevi alıp e-postayı gönderen süreç ise worker’dır.
 
 ### Dependency Injection (DI)
 
@@ -496,6 +542,17 @@ Katmanlı bir uygulamadaki tipik çağrı akışı:
 HTTP isteği → Controller → Service → Repository / DbContext → Veritabanı
               sunum       iş kuralı       veri erişimi
 ```
+
+### ABP Framework
+
+ABP Framework, C# ve ASP.NET Core üzerine kurulmuş, özellikle kurumsal web uygulamaları geliştirmeyi kolaylaştıran açık kaynaklı bir yazılım altyapısıdır. Sık tekrarlanan teknik işleri hazır sunarak geliştiricinin uygulamanın asıl işlevlerine odaklanmasını sağlar.
+
+Başlıca sundukları:
+- Kullanıcı ve yetki yönetimi: Giriş, roller ve izinler.
+- Modüler yapı: Uygulamayı bağımsız geliştirilebilen parçalara ayırma.
+- Çok kiracılı yapı (multi-tenancy): Aynı uygulamayı birden fazla müşteri şirketin kullanabilmesi.
+- Ortak teknik servisler: İşlem kayıtları, arka plan görevleri, önbellekleme ve veri erişimi.
+- Mimari düzen: Karmaşık iş kurallarını yönetmek için katmanlı mimari ve Domain-Driven Design (DDD) desteği.
 
 ## 5. Veritabanı ve ORM
 
@@ -778,8 +835,8 @@ Yorumlarda kodun zaten söylediğini tekrarlamak yerine iş kuralının nedenini
 | Microservices | İş yeteneklerini bağımsız dağıtılabilen servislere böler. | Ekiplerin ve bileşenlerin bağımsız ölçeklenmesi/dağıtılması gerektiğinde |
 | Event-Driven | Bileşenler olay yayımlayıp tüketerek haberleşir. | Sipariş sonrası fatura/bildirim gibi bağımsız süreçlerde |
 | Hexagonal | Uygulama çekirdeğini portlar ve adaptörlerle dış sistemlerden ayırır. | Veritabanı, ödeme veya mesajlaşma altyapısını değiştirmeyi/test etmeyi kolaylaştırmak için |
-
-Microservices ağ hataları ve dağıtık veri yönetimi; event-driven yaklaşım tekrar gelen olaylar ve eventual consistency gibi ek sorumluluklar getirir. Bu mimariler birbirini tamamen dışlamaz. Küçük bir projede önce basit ve düzenli bir yapı kurmayı tercih ederim.
+| Onion Architecture | Amacı uygulamanın temel mantığını veritabanı, arayüz ve dış servislerden bağımsız tutmaktır. | Karmaşık iş kurallarında ve uygulamanın uzun süre geliştirilmesi beklendiğinde |
+| Monolit | Farklı işlevlerin tek bir bütün olarak geliştirilip çalıştırılır. | Yeni bir projeye başlarken ve ekip küçükse tercih ederim |
 
 ### Katmanlı mimari: Service ve Repository
 
