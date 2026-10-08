@@ -6,6 +6,7 @@ In this study, I summarized the basic concepts used in backend development in te
 
 ### Git and GitHub
 #### 1. What Is Git?
+
 Git is a distributed version control system used to track changes made in software projects. It stores the history of a project's files and allows reverting to previous versions when needed.
 
 Git allows multiple developers to work on the same project. Each developer keeps a copy of the project on their own computer and records their changes. This makes it possible to track who made a change, in which file, when, and what kind of change it was.
@@ -21,6 +22,7 @@ The main advantages of Git are as follows:
 Git is mostly used through terminal commands. In addition, graphical Git tools are available in IDEs such as Visual Studio, Visual Studio Code, and JetBrains Rider (PyCharm, IntelliJ IDEA, etc.).
 
 #### 2. What Is GitHub? 
+
 GitHub is a cloud-based platform that allows projects managed with Git to be stored online and shared with team members.
 
 Git is a version control system, while GitHub is a service that hosts Git repositories and supports teamwork. Git can be used on local computers without an internet connection. GitHub is used to store a project on a remote server, share it, and develop it together with team members.
@@ -52,11 +54,11 @@ I can use Git on my computer without internet access; GitHub makes it easier for
 | `git commit -m "Git notes added"` | I save the changes I have staged to the local history. |
 | `git push origin main` | I send local commits to the remote repository. |
 | `git pull` | I fetch the changes from the remote branch and integrate them into my current branch; a merge or rebase may be performed depending on the configuration. |
-| `git branch arastirma` | I create a new branch; this command alone does not switch to that branch. |
-| `git merge arastirma` | I merge the specified branch into the branch I am currently on. |
-| `git checkout -b arastirma` | A new branch is created and switched to. It is also used to switch between branches. |
+| `git branch research` | I create a new branch; this command alone does not switch to that branch. |
+| `git merge research` | I merge the specified branch into the branch I am currently on. |
+| `git checkout -b research` | A new branch is created and switched to. It is also used to switch between branches. |
 
-For example, I can switch to the research branch with `git switch arastirma` and work there. `add`, `commit`, and `push` are not the same operation: they are the steps of staging, saving locally, and sharing.
+For example, I can switch to the research branch with `git switch research` and work there. `add`, `commit`, and `push` are not the same operation: they are the steps of staging, saving locally, and sharing.
 
 ### Merge Conflict
 
@@ -99,7 +101,7 @@ on: [push, pull_request]
 permissions:
   contents: read
 jobs:
-  kontrol:
+  check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -231,8 +233,8 @@ Asynchrony does not mean that the operation will automatically finish faster or 
 
 ```csharp
 // Inside a method using EF Core:
-var urunler = db.Urunler.ToList();             // Synchronous
-var urunlerAsync = await db.Urunler.ToListAsync(); // Asynchronous
+var products = db.Products.ToList();             // Synchronous
+var productsAsync = await db.Products.ToListAsync(); // Asynchronous
 ```
 
 - `async` allows `await` to be used in a method; it does not start a new thread by itself.
@@ -247,8 +249,8 @@ A typical example for me is waiting asynchronously for the database response whi
 Although it resembles the “arrow function” expression in JavaScript, in C#, `=>` is used for lambdas and expression-bodied members; it does not imply asynchrony.
 
 ```csharp
-Func<int, int> ikiKat = sayi => sayi * 2; // Lambda
-decimal KdvEkle(decimal fiyat) => fiyat * 1.20m; // Short method body
+Func<int, int> doubleNumber = number => number * 2; // Lambda
+decimal AddVat(decimal price) => price * 1.20m; // Short method body
 ```
 ### Using async with `=>`
 
@@ -256,22 +258,22 @@ decimal KdvEkle(decimal fiyat) => fiyat * 1.20m; // Short method body
 
 ```csharp
 // Asynchronous lambda
-Func<int, Task<int>> ikiKatAsync = async sayi =>
+Func<int, Task<int>> doubleNumberAsync = async number =>
 {
     await Task.Delay(100); // Example delay
-    return sayi * 2;
+    return number * 2;
 };
 
 // Asynchronous short method body
-async Task<string> SayfaGetirAsync(string url) =>
+async Task<string> FetchPageAsync(string url) =>
     await httpClient.GetStringAsync(url);
 
 // Usage
-int sonuc = await ikiKatAsync(5);          // 10
-string html = await SayfaGetirAsync("https://ornek.com");
+int result = await doubleNumberAsync(5);          // 10
+string html = await FetchPageAsync("https://example.com");
 ```
 
-In these examples, => shortens the syntax by connecting the parameters on the left to the body on the right; it is the async keyword added at the beginning that provides asynchrony. In the ikiKatAsync lambda, the await Task.Delay(100) line waits for 100 ms without blocking the thread and then returns the result of sayi * 2 as a Task<int>. In the SayfaGetirAsync method, => defines the body on a single line without writing braces or return; the method allows the rest of the program to run while downloading the page content. The await expressions in the usage section wait for the tasks to complete and assign the actual values inside the Tasks to the variables; without await, a Task object that has not yet finished would be assigned to the variables instead of the result.
+In these examples, => shortens the syntax by connecting the parameters on the left to the body on the right; it is the async keyword added at the beginning that provides asynchrony. In the doubleNumberAsync lambda, the await Task.Delay(100) line waits for 100 ms without blocking the thread and then returns the result of number * 2 as a Task<int>. In the FetchPageAsync method, => defines the body on a single line without writing braces or return; the method allows the rest of the program to run while downloading the page content. The await expressions in the usage section wait for the tasks to complete and assign the actual values inside the Tasks to the variables; without await, a Task object that has not yet finished would be assigned to the variables instead of the result.
 
 ## 3. Fundamentals of Backend Development
 
@@ -309,12 +311,12 @@ Nginx, Apache, and IIS are common examples of web servers.
 
 #### What Is an API? 
 
-An API (Application Programming Interface), known in Turkish as Uygulama Programlama Arayüzü, enables software systems to communicate with one another through defined rules.
+An API (Application Programming Interface) enables software systems to communicate with one another through defined rules.
 
 For example, a weather application can retrieve temperature data by sending city information to another system's API.
 
 An address that an API provides for a specific operation is called an endpoint, meaning an end point.
->https://api.ornek.com/urunler
+>https://api.example.com/products
 This address can be used to access operations related to products.
 
 API Types by Access Level: 
@@ -335,37 +337,37 @@ HTTP - Hypertext Transfer Protocol is the request/response protocol between a cl
 
 | Method | Example | Purpose |
 | --- | --- | --- |
-| GET | `/api/urunler/5` | Read product information |
-| POST | `/api/urunler` | Create a product using the submitted information |
-| PUT | `/api/urunler/5` | Replace the product's updatable representation in its entirety |
-| DELETE | `/api/urunler/5` | Delete the product |
+| GET | `/api/products/5` | Read product information |
+| POST | `/api/products` | Create a product using the submitted information |
+| PUT | `/api/products/5` | Replace the product's updatable representation in its entirety |
+| DELETE | `/api/products/5` | Delete the product |
 
 Repeating GET, PUT, and DELETE preserves the same intended server state; this is called **idempotency**. Response codes do not have to be the same. With POST, repeating a request may create a new record. PATCH can be used for partial updates. 
 
 #### GET - Reading Data
 Used to retrieve a resource or a list of resources.
 
-**GET /urunler/15** (This request asks for the information of the product with the ID 15.)
+**GET /products/15** (This request asks for the information of the product with the ID 15.)
 
 Example response:
 
 ```json
 {
   "id": 15,
-  "ad": "Keyboard",
-  "fiyat": 1200
+  "name": "Keyboard",
+  "price": 1200
 }
 ```
 
 #### POST - Sending Data and Creating Resources
 Generally used to create a new resource or initiate an operation on the server.
 
-**POST /urunler**
+**POST /products**
 
 ```json
 {
-  "ad": "Mouse",
-  "fiyat": 650
+  "name": "Mouse",
+  "price": 650
 }
 ```
 
@@ -374,21 +376,21 @@ When the request is processed successfully, a product named Mouse with a price o
 #### PUT - PATCH Usage and Difference 
 When we want to set the product's price to 1500, PUT and PATCH are used as follows:
 
-**PUT /urunler/15**
+**PUT /products/15**
 
 ```json
 {
-  "ad": "Mechanical Keyboard",
-  "fiyat": 1500,
-  "stok": 20
+  "name": "Mechanical Keyboard",
+  "price": 1500,
+  "stock": 20
 }
 ```
 
-**PATCH /urunler/15**
+**PATCH /products/15**
 
 ```json
 {
-  "fiyat": 1500
+  "price": 1500
 }
 ```
 Revise it from scratch with PUT, and change only the desired data with PATCH. The PATCH body here is meaningful if the API supports this format.
@@ -397,7 +399,7 @@ Revise it from scratch with PUT, and change only the desired data with PATCH. Th
 #### DELETE - Deleting Resources
 Used to delete a specific resource.
 
-**DELETE /urunler/15** (This request asks to delete the product with the ID 15.)
+**DELETE /products/15** (This request asks to delete the product with the ID 15.)
 
 #### Common HTTP Status Codes
 
@@ -432,10 +434,10 @@ JSON (JavaScript Object Notation) is a text-based format used for data exchange:
 ```json
 {
   "id": 5,
-  "ad": "Keyboard",
-  "fiyat": 850.50,
-  "stoktaVar": true,
-  "etiketler": ["computer", "accessory"]
+  "name": "Keyboard",
+  "price": 850.50,
+  "inStock": true,
+  "tags": ["computer", "accessory"]
 }
 ```
 
@@ -484,7 +486,7 @@ MVC separates responsibilities into **Model**, **View**, and **Controller**. The
 Middleware is a component that takes part in processing an HTTP request. It can pass the request to the next component or complete the response itself. The following order is for an application in which the relevant services have been registered:
 
 ```csharp
-app.UseExceptionHandler("/hata"); // An error endpoint handling this address is required.
+app.UseExceptionHandler("/error"); // An error endpoint handling this address is required.
 app.UseHttpsRedirection();
 app.UseRouting();
 app.UseAuthentication();
@@ -517,20 +519,20 @@ With DI, a class receives its dependency from outside instead of creating it int
 
 ```csharp
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddScoped<IFiyatService, FiyatService>();
+builder.Services.AddScoped<IPriceService, PriceService>();
 var app = builder.Build();
 
-app.MapGet("/api/fiyat", (IFiyatService servis) => servis.KdvEkle(100m));
+app.MapGet("/api/price", (IPriceService service) => service.AddVat(100m));
 app.Run();
 
-public interface IFiyatService
+public interface IPriceService
 {
-    decimal KdvEkle(decimal fiyat);
+    decimal AddVat(decimal price);
 }
 
-public class FiyatService : IFiyatService
+public class PriceService : IPriceService
 {
-    public decimal KdvEkle(decimal fiyat) => fiyat * 1.20m;
+    public decimal AddVat(decimal price) => price * 1.20m;
 }
 ```
 
@@ -564,26 +566,26 @@ In an application where the relationships between products, customers, and order
 
 ### ORM, Entity Framework Core, and DbContext
 
-ORM (Object-Relational Mapping) provides mapping between objects in the application and database records. EF Core is one of the tools that does this for .NET. `DbContext` is the center of querying, change tracking, and save operations. `DbSet<Urun>` lets me query products; `SaveChangesAsync()` writes the tracked changes to the database.
+ORM (Object-Relational Mapping) provides mapping between objects in the application and database records. EF Core is one of the tools that does this for .NET. `DbContext` is the center of querying, change tracking, and save operations. `DbSet<Product>` lets me query products; `SaveChangesAsync()` writes the tracked changes to the database.
 
 ```csharp
 using Microsoft.EntityFrameworkCore;
 
-public class MagazaDbContext(DbContextOptions<MagazaDbContext> options)
+public class StoreDbContext(DbContextOptions<StoreDbContext> options)
     : DbContext(options)
 {
-    public DbSet<Urun> Urunler => Set<Urun>();
+    public DbSet<Product> Products => Set<Product>();
 }
 
-public class Urun
+public class Product
 {
     public int Id { get; set; }
-    public string Ad { get; set; } = "";
-    public decimal Fiyat { get; set; }
+    public string Name { get; set; } = "";
+    public decimal Price { get; set; }
 }
 ```
 
-In addition to these classes, a database provider and connection configuration are required. For example, for SQL Server, `AddDbContext<MagazaDbContext>(o => o.UseSqlServer(connectionString))` is registered. I do not run concurrent operations on the same `DbContext`; the context is not thread-safe.
+In addition to these classes, a database provider and connection configuration are required. For example, for SQL Server, `AddDbContext<StoreDbContext>(o => o.UseSqlServer(connectionString))` is registered. I do not run concurrent operations on the same `DbContext`; the context is not thread-safe.
 
 #### How is DbContext used?
 
@@ -591,28 +593,28 @@ In addition to these classes, a database provider and connection configuration a
 ```csharp
 
 // DbContext is injected into the service through the constructor via DI.
-public class UrunServisi(MagazaDbContext db)
+public class ProductService(StoreDbContext db)
 {
     // Insertion: Add starts tracking the object, and SaveChangesAsync writes it to the database.
-    public async Task UrunEkleAsync(string ad, decimal fiyat)
+    public async Task AddProductAsync(string name, decimal price)
     {
-        db.Urunler.Add(new Urun { Ad = ad, Fiyat = fiyat }); // The change is tracked
+        db.Products.Add(new Product { Name = name, Price = price }); // The change is tracked
         await db.SaveChangesAsync();                          // INSERT executes
     }
 
     // Update: A change made to a tracked object is written with SaveChangesAsync.
-    public async Task FiyatGuncelleAsync(int id, decimal yeniFiyat)
+    public async Task UpdatePriceAsync(int id, decimal newPrice)
     {
-        var urun = await db.Urunler.FindAsync(id);            // The record is found and tracked
-        if (urun is null) return;
+        var product = await db.Products.FindAsync(id);            // The record is found and tracked
+        if (product is null) return;
 
-        urun.Fiyat = yeniFiyat;                               // The change is tracked
+        product.Price = newPrice;                               // The change is tracked
         await db.SaveChangesAsync();                          // UPDATE executes
     }
 
     // Reading: A query is written through DbSet.
-    public Task<List<Urun>> HepsiniGetirAsync()
-        => db.Urunler.ToListAsync();                          // SELECT executes
+    public Task<List<Product>> GetAllAsync()
+        => db.Products.ToListAsync();                          // SELECT executes
 }
 ```
 
@@ -622,20 +624,20 @@ public class UrunServisi(MagazaDbContext db)
 LINQ is a construct that lets me query data within C#. It can also be used with in-memory collections; in EF Core, supported expressions are translated into SQL by the provider.
 
 ```csharp
-var urunler = await db.Urunler
-    .Where(u => u.Fiyat > 500)
-    .OrderBy(u => u.Fiyat)
-    .Select(u => new { u.Ad, u.Fiyat })
+var products = await db.Products
+    .Where(u => u.Price > 500)
+    .OrderBy(u => u.Price)
+    .Select(u => new { u.Name, u.Price })
     .ToListAsync();
 ```
 
 Logical SQL equivalent:
 
 ```sql
-SELECT Ad, Fiyat
-FROM Urunler
-WHERE Fiyat > 500
-ORDER BY Fiyat;
+SELECT Name, Price
+FROM Products
+WHERE Price > 500
+ORDER BY Price;
 ```
 
 `Where` filters, `Select` selects fields, and `OrderBy` sorts. `ToListAsync` retrieves the result; the preceding steps build the query. The details of the generated SQL may vary by provider.
@@ -643,10 +645,10 @@ ORDER BY Fiyat;
 | LINQ example | Meaning in SQL |
 | --- | --- |
 | `CountAsync()` | Counting with `COUNT(*)` |
-| `AnyAsync(u => u.Fiyat > 500)` | Checking whether a record exists using `EXISTS` logic |
+| `AnyAsync(u => u.Price > 500)` | Checking whether a record exists using `EXISTS` logic |
 | `FirstOrDefaultAsync(u => u.Id == 5)` | Filtering and retrieving at most one record; the default value if none exists |
 | `OrderBy(u => u.Id).Skip(10).Take(10)` | Pagination in an ordered result with `OFFSET/FETCH` or `LIMIT/OFFSET` |
-| `GroupBy(u => u.Ad).Select(g => new { Ad = g.Key, Adet = g.Count() })` | Grouping with `GROUP BY Ad` and `COUNT(*)` |
+| `GroupBy(u => u.Name).Select(g => new { Name = g.Key, Count = g.Count() })` | Grouping with `GROUP BY Name` and `COUNT(*)` |
 
 ### Code-First and Database-First
 
@@ -660,10 +662,10 @@ In Code-First, I also review the generated migration; an incorrect schema change
 ### Four basic SQL queries
 
 ```sql
-SELECT Id, Ad, Fiyat FROM Urunler WHERE Fiyat > 500;
-INSERT INTO Urunler (Ad, Fiyat) VALUES ('Keyboard', 850.50);
-UPDATE Urunler SET Fiyat = 900 WHERE Id = 5;
-DELETE FROM Urunler WHERE Id = 5;
+SELECT Id, Name, Price FROM Products WHERE Price > 500;
+INSERT INTO Products (Name, Price) VALUES ('Keyboard', 850.50);
+UPDATE Products SET Price = 900 WHERE Id = 5;
+DELETE FROM Products WHERE Id = 5;
 ```
 
 These perform reading, insertion, updating, and deletion, respectively. I assumed that the `Id` field is generated automatically. If `WHERE` is omitted from `UPDATE` and `DELETE`, all rows may be affected. I use parameterized queries instead of concatenating user-provided values into SQL text.
@@ -753,7 +755,7 @@ A log level indicates the severity of an entry. By setting a minimum level in `a
 | Critical | An error that seriously affects the application's operation |
 | None | A filter value that disables logging |
 
-For example, I use `logger.LogInformation("Order created: {SiparisId}", id)`. Named fields make searching easier. I do not log information such as passwords and access tokens.
+For example, I use `logger.LogInformation("Order created: {OrderId}", id)`. Named fields make searching easier. I do not log information such as passwords and access tokens.
 
 ### Global exception handling and UseExceptionHandler
 
@@ -772,13 +774,13 @@ app.UseExceptionHandler(handler => handler.Run(async context =>
         .ExecuteAsync(context);
 }));
 
-app.MapGet("/api/durum", (ILogger<Program> logger) =>
+app.MapGet("/api/status", (ILogger<Program> logger) =>
 {
     logger.LogInformation("Status check performed.");
-    return Results.Ok(new { durum = "running" });
+    return Results.Ok(new { status = "running" });
 });
 
-app.MapGet("/api/hata", IResult () =>
+app.MapGet("/api/error", IResult () =>
 {
     throw new InvalidOperationException("Test error");
     // UseExceptionHandler catches this error and returns a 500 problem response to the client.
@@ -788,7 +790,7 @@ app.MapGet("/api/hata", IResult () =>
 app.Run();
 ```
 
-`UseExceptionHandler` handles unhandled errors from subsequent HTTP components. For example, the error thrown in a request to `/api/hata` reaches this middleware because it is not caught in the endpoint. I return a standard problem response to the client instead of a stack trace; I examine the technical details in the server logs. I handle expected outcomes directly, such as returning `400` for invalid input or `404` for a product that is not found. This middleware does not cover errors in separately running workers.
+`UseExceptionHandler` handles unhandled errors from subsequent HTTP components. For example, the error thrown in a request to `/api/error` reaches this middleware because it is not caught in the endpoint. I return a standard problem response to the client instead of a stack trace; I examine the technical details in the server logs. I handle expected outcomes directly, such as returning `400` for invalid input or `404` for a product that is not found. This middleware does not cover errors in separately running workers.
 
 ## 8. Software Development Principles
 
@@ -796,19 +798,19 @@ app.Run();
 
 | Principle | My understanding and brief example |
 | --- | --- |
-| **S - Single Responsibility** | A class should have one primary reason to change. `SiparisService` manages order rules, and `EmailService` manages sending emails. |
-| **O - Open/Closed** | I should not have to keep changing working code when adding new behavior. For a new discount type, I can add an `IIndirim` implementation instead of expanding the existing calculator. |
-| **L - Liskov Substitution** | A subtype should not violate the expected contract of its base type. I should not bind a read-only repository to an interface that promises `Kaydet` and then throw an error when it is called. |
-| **I - Interface Segregation** | A class should not depend on operations it does not use. I can separate reading and writing needs with `IUrunOkuyucu` and `IUrunYazici`. |
-| **D - Dependency Inversion** | Business rules should depend on abstractions rather than concrete infrastructure. The order service can accept `IBildirimGonderici` instead of `SmtpEmailService`. |
+| **S - Single Responsibility** | A class should have one primary reason to change. `OrderService` manages order rules, and `EmailService` manages sending emails. |
+| **O - Open/Closed** | I should not have to keep changing working code when adding new behavior. For a new discount type, I can add an `IDiscount` implementation instead of expanding the existing calculator. |
+| **L - Liskov Substitution** | A subtype should not violate the expected contract of its base type. I should not bind a read-only repository to an interface that promises `Save` and then throw an error when it is called. |
+| **I - Interface Segregation** | A class should not depend on operations it does not use. I can separate reading and writing needs with `IProductReader` and `IProductWriter`. |
+| **D - Dependency Inversion** | Business rules should depend on abstractions rather than concrete infrastructure. The order service can accept `INotificationSender` instead of `SmtpEmailService`. |
 
 DI makes it easier for me to apply the last principle; however, using DI alone does not mean the design is automatically SOLID.
 
 ### Singleton, Repository, and Factory
 
 - **Singleton:** Shares a single instance. If there is mutable shared state, I need to consider concurrent access; I do not store user-specific data in a singleton service.
-- **Repository:** Encapsulates data access behind specific operations. For example, it can abstract the `SiparisleriMusteriyeGoreGetir` query. Since EF Core already provides similar responsibilities, I do not consider a layer that merely repeats every `DbSet` method mandatory.
-- **Factory:** Centralizes the object creation decision. Selecting the appropriate `IOdemeSaglayici` implementation based on the payment method is an example of this.
+- **Repository:** Encapsulates data access behind specific operations. For example, it can abstract the `GetOrdersByCustomer` query. Since EF Core already provides similar responsibilities, I do not consider a layer that merely repeats every `DbSet` method mandatory.
+- **Factory:** Centralizes the object creation decision. Selecting the appropriate `IPaymentProvider` implementation based on the payment method is an example of this.
 
 ### Clean Code
 
@@ -819,8 +821,8 @@ I see Clean Code as allowing the next person who reads the code to easily unders
 if (s > 0 && a) { /* ... */ }
 
 // The same intent is clearer:
-bool satinAlinabilir = stokAdedi > 0 && urunAktif;
-if (!satinAlinabilir)
+bool canBePurchased = stockQuantity > 0 && isProductActive;
+if (!canBePurchased)
     return;
 ```
 
